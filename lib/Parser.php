@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class XmlDoc
+ * Class Parser
  */
-abstract class XmlDoc {
+abstract class Parser {
 
     /**
      * The location of the input file
@@ -89,13 +89,6 @@ abstract class XmlDoc {
     abstract public function parse($file);
 
     /**
-     * @param $xml
-     * @param $i
-     * @return mixed
-     */
-    abstract public function createItem($xml, $i);
-
-    /**
      * @param $items
      * @param $file
      * @return int
@@ -139,6 +132,5 @@ abstract class XmlDoc {
         if ($elements->length == 0) return false;
         return $elements->item(0)->nodeValue;
     }
-
 
 }
