@@ -1,35 +1,38 @@
-ovp-migration-tool
-==============
-
 Online Video Platform Migration Tool:
+====================================
 
-Currently has support for migrating from Brightcove to Kaltura.
-With some additional work this could be abstract to translate from any online video provider to another (providing they support export / import functionality)
+The intended usage of this little library is to be able to migrate video content from one provider to another.
+Currently there is only support for BrightCove to Kaltura, however it has been abstracted to allow easy implementation for others.
 
-1. Get an xml file of all your videos from Brightcove
+If you have a specific request why not get in contact or fork the repo.
 
-http://api.brightcove.com/services/library?
+## BrightCove to Kaltura Usage:
 
-command=find_all_videos
-media_delivery=http
-output=mrss
-page_number=0
-page_size=100
-sort_by=PUBLISH_DATE
-sort_order=DESC
-token='your access token'
+#####Make a request to BrightCove for all your videos:
+  
+```
+// Get all videos
+http://api.brightcove.com/services/library?command=find_all_videos&token=0Z2dtxTdJAxtbZ-d0U7Bhio2V1Rhr5Iafl5FFtDPY8E.
+```
+See here for more info: http://support.brightcove.com/en/video-cloud/docs/javascript-media-api-examples#find_all 
 
-2. Run the following command from your command line:
+#####Set up the parser:
 
-$ php migrate.php -f ‘brightcove_export.xml’ -l 5
+```
+require('Lib/Migrate.php');
 
-Param Options:
--f File
--l Limit
+// Migrate the file
+$migrate = new Migrate();
+$migrate->setFile('Data/BrightCove.xml');
+$migrate->setOutputType(Migrate::KALTURA);
+$migrate->setOutputFileName('Data/Kaltura.xml');
+$migrate->go();
+```
 
-3. Locate the file and upload to Kalturas bulk import section
+#####Run the following command (or navigate to the file in a web browser):
 
-www.kaltura......
+```
+$ php index.php
+```
 
-
-This process can take some time, they will be encoding all of your videos again.
+Now upload the exported file to Kaltura's bulk upload. For more info see here: http://knowledge.kaltura.com/faq/what-bulk-upload
