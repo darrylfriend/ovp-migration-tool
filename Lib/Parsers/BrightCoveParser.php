@@ -1,21 +1,45 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: darryl
- * Date: 22/02/2014
- * Time: 11:31
- */
+require_once('Lib/Parser.php');
 
 class BrightCoveParser extends Parser {
 
-    public function parse($file) {
+    /**
+     * @return array|bool
+     */
+    public function parse() {
+
+        echo 'BrightCoveParser: Parsing File<br>';
+
+        // Ensure we have content
+        if (empty($this->input)) {
+            echo 'BrightCoveParser: No Content<br>';
+            return false;
+        }
+
+        // Load xml
+        $doc = new DOMDocument();
+        if (!$doc->loadXML($this->input)) {
+            $err = libxml_get_last_error();
+            if ($err === false) {
+                echo 'BrightCoveParser: Could not load XML into DOMDocument<br>';
+            } else {
+                echo 'BrightCoveParser'.$err->message.'<br>';
+            }
+            return false;
+        }
+
+        return $this->parseDocument($doc);
+    }
+
+    protected function parseDocument(DOMDocument $doc) {
 
         // Get BC items
         $items = $doc->getElementsByTagName('item');
 
         // BC details
         $details = array('title', 'description');
+
         foreach($items as $key => $item) {
 
             // Grab Item Details
@@ -72,10 +96,20 @@ class BrightCoveParser extends Parser {
 
         }
 
-        if($this->reverseOrder){
-            $this->doReverseOrder();
-        }
-
         return $this->items;
     }
+
+    /**
+     *
+     * @return number
+     */
+    public function orderDesc(){
+
+        // Sort items to be ordered date ascending
+        usort($this->items, function($a, $b) {
+            if ($a['pubDate'] == $b['pubDate']) return 0;
+            return ($a['pubDate'] < $b['pubDate']) ? -1 : 1;
+        });
+    }
+
 }

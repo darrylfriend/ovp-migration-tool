@@ -1,12 +1,8 @@
 <?php
-namespace \lib;
 
-/**
- * Created by PhpStorm.
- * User: darryl
- * Date: 22/02/2014
- * Time: 11:56
- */
+require_once('Lib/Parser.php');
+require_once('Lib/Parsers/BrightCoveParser.php');
+require_once('Lib/Parsers/KalturaParser.php');
 
 class ParserFactory {
 
@@ -15,25 +11,24 @@ class ParserFactory {
      *
      *  - Brightcove
      * 	- Kaltura
-     * 	- XXX - Todo, bring in support for other online video platforms
+     * 	- Todo, bring in support for other online video platforms
      *
-     * @param $file
+     * @param $filename
      * @return bool
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
-    public function getParser($file) {
+    public function getParser($filename) {
 
-        list($protocol, $filename) = explode('://',$file);
-
-        if ($protocol !== 'file' || !file_exists($filename)) {
-            throw new \RuntimeException('File does not exist: '.$file);
+        if (!file_exists($filename)) {
+            echo 'ParseFactory: File does not exist: '.$filename.'<br>';
+            return false;
         }
 
-        // Only XML files are know for import, export.
-        // XXX - Possibly may need to rewrite this if options for csv or similar are provided by other providers
-        $ext =  strtolower(findFileExtension($filename));
+        // Todo - Possibly may need to rewrite this if csv or similar outputs are provided by other providers
+        $ext =  strtolower($this->findFileExtension($filename));
         if ($ext !== 'xml') {
-            throw new \RuntimeException('Unsupported file type: '.$ext);
+            echo 'ParseFactory: Unsupported file type: '.$ext.'<br>';
+            return false;
         }
 
         // Get file contents
@@ -42,37 +37,49 @@ class ParserFactory {
         // Identify file type
         $type = false;
         if (strpos($input,'</generator>') !== false && strpos($input,'http://www.brightcove.com/?v=1.0') !== false) {
-            $type = 'brightcove';
+            $type = 'BrightCove';
         } elseif (false) {
-            // - XXX
-            // Add support for Kaltura
-            $type = 'kaltura';
+            // Todo - Add support for Kaltura
+            $type = 'Kaltura';
         } else {
-            // XXX - Bring in SUPPORT for other providers
-            throw new \RuntimeException('Unsupported file import type: '.$filename);
+            // Todo - Bring in SUPPORT for other providers
+            echo 'ParseFactory: Unsupported file import type: '.$filename.'<br>';
+            return false;
         }
 
         // Load the appropriate parser
         if ($type != false) {
             $obj = $this->loadParserInstance($type);
             if ($obj) {
-                // Set file but don't reload
-                $obj->setFile($file, false);
+                // Set input content to parse
                 $obj->setInput($input);
             }
         } else {
-            $obj = false;
+            echo 'ParseFactory: Could not get parser instance: '.$type.'<br>';
+            return false;
         }
 
         return $obj;
     }
 
     public function loadParserInstance($type) {
-        $className = __NAMESPACE__.'\\Parsers\\'.camelize($type).'Parser';
+
+        $className = $type.'Parser';
+        echo 'ParseFactory: Looking for classname - '.$className.'<br>';
+
         if (class_exists($className)) {
+            echo 'ParseFactory: Found class name: '.$className.'<br>';
             return new $className();
         } else {
-            throw new \RuntimeException('Could not find parser of type: '.$type);
+            echo 'ParseFactory: Could not find parser of type: '.$type.'<br>';
+            return false;
         }
+    }
+
+    protected function findFileExtension ($filename) {
+        $filename = explode('.',$filename);
+        $length = count($filename);
+        $extension = $filename[$length-1];
+        return $extension;
     }
 }

@@ -64,16 +64,16 @@ abstract class Parser {
      * @param string $filename
      * @return boolean|string
      */
-    public function getFileContents($filename) {
+    static public function getFileContents($filename) {
 
         if (!file_exists($filename)) {
-            $this->debug[] = 'File does not exist: '.$filename;
+            echo 'Parser: File does not exist: '.$filename;
             return false;
         }
 
         $input = file_get_contents($filename);
         if (empty($input)) {
-            $this->debug[] = 'File is empty: '.$filename;
+            echo 'Parser: File is empty: '.$filename;
             return false;
         }
 
@@ -83,10 +83,11 @@ abstract class Parser {
     /**
      * Parse will prepare the items
      *
-     * @param unknown $file
      * @return void|boolean
      */
-    abstract public function parse($file);
+    abstract public function parse();
+
+    abstract protected function orderDesc();
 
     /**
      *
