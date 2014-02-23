@@ -1,14 +1,47 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: darryl
- * Date: 22/02/2014
- * Time: 11:31
- */
+require_once('Lib/Writer.php');
 
-class KalturaWriter extends XmlWriter {
+class KalturaWriter extends Writer {
 
+    /**
+     * Write the contents to a file
+     *
+     * @return int|mixed
+     */
+    public function write() {
+
+        echo 'KalturaWriter: Starting document creation<br>';
+
+        $xml = new DOMDocument();
+        if ($this->formatXml) {
+            $xml->formatOutput = true;
+        }
+
+        echo 'KalturaWriter: Writing to doc<br>';
+        $channel = $xml->createElement('channel');
+
+        // Loop over items writing them to the doc
+        foreach($this->items as &$i) {
+            $item = $this->createItem($xml, $i);
+            $channel->appendChild($item);
+        }
+
+        // Append the XML to the doc
+        $xml->appendChild($channel);
+        echo 'KalturaWriter: Doc writing complete<br>';
+
+        // Save the XML document
+        return $xml->save($this->fileName);
+    }
+
+    /**
+     * Create an XML element
+     *
+     * @param $xml
+     * @param $i
+     * @return mixed
+     */
     public function createItem($xml, $i) {
 
         // Item
@@ -35,22 +68,26 @@ class KalturaWriter extends XmlWriter {
         $item->appendChild($child);
 
         // Tags
-        $child = $xml->createElement('tags');
-        foreach($i['tags'] as $t) {
-            $tag = $xml->createElement('tag');
-            $tag->nodeValue = $t;
-            $child->appendChild($tag);
+        if (isset($i['tags']) && !empty($i['tags'])) {
+            $child = $xml->createElement('tags');
+            foreach($i['tags'] as $t) {
+                $tag = $xml->createElement('tag');
+                $tag->nodeValue = $t;
+                $child->appendChild($tag);
+            }
+            $item->appendChild($child);
         }
-        $item->appendChild($child);
 
         // Categories
-        $child = $xml->createElement('categories');
-        foreach($i['category'] as $t) {
-            $tag = $xml->createElement('category');
-            $tag->nodeValue = $t;
-            $child->appendChild($tag);
+        if (isset($i['category']) && !empty($i['category'])) {
+            $child = $xml->createElement('categories');
+            foreach($i['category'] as $t) {
+                $tag = $xml->createElement('category');
+                $tag->nodeValue = $t;
+                $child->appendChild($tag);
+            }
+            $item->appendChild($child);
         }
-        $item->appendChild($child);
 
         // Media Type
         $child = $xml->createElement('media');
@@ -98,15 +135,14 @@ class KalturaWriter extends XmlWriter {
         }
         $item->appendChild($child);
 
-        // StartDate
+        // Todo - Include start date on output
         /*$child = $xml->createElement('startDate');
         $child->nodeValue = $i['pubDate'];
         $item->appendChild($child);
 
-        // EndDate
+        // Todo - Include end date on output
         $child = $xml->createElement('endDate');
         $child->nodeValue = date('Y-m-d H:i:s',$i['pubDate']);*/
-
 
         $item->appendChild($child);
 

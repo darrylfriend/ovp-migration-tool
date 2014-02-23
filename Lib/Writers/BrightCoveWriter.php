@@ -1,21 +1,13 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: darryl
- * Date: 22/02/2014
- * Time: 11:31
- */
+require_once('Lib/Writer.php');
 
-class BrightCoveWriter extends XmlWriter {
+class BrightCoveWriter extends Writer {
 
     /**
-     * XXX - Todo: write createItem function to allow creation of BrightCove import file
-     *
-     * @param $xml
-     * @param $i
+     * Todo: Write the BrightCove import file function
      */
-    public function createItem($xml, $i) {
+    public function write() {
 
     }
 
