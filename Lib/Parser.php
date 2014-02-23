@@ -89,25 +89,6 @@ abstract class Parser {
     abstract public function parse($file);
 
     /**
-     * @param $items
-     * @param $file
-     * @return int
-     */
-    public function write($items, $file) {
-
-        $xml = new DOMDocument();
-        $xml->formatOutput = true;
-        $channel = $xml->createElement('channel');
-        foreach($items as &$i) {
-            $item = $this->createItem($xml, $i);
-            $channel->appendChild($item);
-        }
-
-        $xml->appendChild($channel);
-        return $xml->save($file);
-    }
-
-    /**
      *
      * @return number
      */
@@ -132,5 +113,4 @@ abstract class Parser {
         if ($elements->length == 0) return false;
         return $elements->item(0)->nodeValue;
     }
-
 }
