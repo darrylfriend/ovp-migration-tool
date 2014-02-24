@@ -4,7 +4,7 @@ Online Video Platform Migration Tool:
 The intended usage of this little library is to be able to migrate video content from one provider to another.
 Currently there is only support for BrightCove to Kaltura, however it has been abstracted to allow easy implementation for others.
 
-If you have a specific request why not get in contact or fork the repo.
+If you have a specific request why not get in contact me or even better fork the repo.
 
 ## BrightCove to Kaltura Usage:
 
